@@ -164,37 +164,37 @@ except ImportError:
 else:
     class SSLConnectionPool(ConnectionPool):
         """ SSLConnectionPool creates connections wrapped with SSL/TLS.
-    
+
         :param host: hostname
         :param port: port
         :param ssl_options: accepts any options supported by `ssl.wrap_socket`
         :param ssl_context_factory: use `ssl.create_default_context` by default
             if provided. It must be a callbable that returns a SSLContext.
         """
-    
+
         default_options = {
             'ciphers': _DEFAULT_CIPHERS,
             'ca_certs': _CA_CERTS,
             'cert_reqs': gevent.ssl.CERT_REQUIRED
         }
-    
+
         ssl_context_factory = getattr(gevent.ssl, "create_default_context", None)
-    
+
         def __init__(self, host, port, **kw):
             self.ssl_options = kw.pop("ssl_options", {})
             self.ssl_context_factory = kw.pop('ssl_context_factory', None)
             self.insecure = kw.pop('insecure', False)
             super(SSLConnectionPool, self).__init__(host, port, **kw)
-    
+
         def after_connect(self, sock):
             super(SSLConnectionPool, self).after_connect(sock)
             if not self.insecure:
                 match_hostname(sock.getpeercert(), self._host)
-    
+
         def _create_tcp_socket(self, family, socktype, protocol):
             sock = super(SSLConnectionPool, self)._create_tcp_socket(
                 family, socktype, protocol)
-    
+
             if self.ssl_context_factory is None:
                 ssl_options = self.default_options.copy()
                 ssl_options.update(self.ssl_options)

@@ -85,13 +85,13 @@ class Response(_Response):
 
 
 class Session(_Session):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(Session, self).__init__()
         self.headers = Headers(default_headers())
         self.adapters.clear()
-        self.mount('http://', GHCAdapter())
-        self.mount('https://', GHCAdapter(ssl=True))
-        
+        self.mount('http://', GHCAdapter(**kwargs))
+        self.mount('https://', GHCAdapter(**kwargs))
+
     def prepare_request(self, request):
         """Constructs a :class:`PreparedRequest <PreparedRequest>` for
         transmission and returns it. The :class:`PreparedRequest` has settings
@@ -136,7 +136,7 @@ class Session(_Session):
 
 
 class GHCAdapter(HTTPAdapter):
-    def __init__(self, pool_connections=DEFAULT_POOLSIZE, max_retries=DEFAULT_RETRIES, 
+    def __init__(self, pool_connections=DEFAULT_POOLSIZE, max_retries=DEFAULT_RETRIES,
                  timeout=None, **kwargs):
         # Make sure we got a simple number and not some strange thingy
         self.max_retries = int(max_retries)
@@ -153,10 +153,10 @@ class GHCAdapter(HTTPAdapter):
                 raise ValueError(err)
         else:
             connection_timeout = network_timeout = timeout
-        
-        self.init_poolmanager(pool_connections, connection_timeout=connection_timeout, 
+
+        self.init_poolmanager(pool_connections, connection_timeout=connection_timeout,
                               network_timeout=network_timeout, **kwargs)
-        
+
     def init_poolmanager(self, connections, **pool_kwargs):
         self._pool_connections = connections
         self._pool_args = pool_kwargs
@@ -276,7 +276,6 @@ class GHCAdapter(HTTPAdapter):
         parsed_url = URL(request.url)
         client = self.get_connection(parsed_url, proxies)
         parsed_url = self.request_url(parsed_url, proxies)
-
         try:
             resp = client.request(request.method, parsed_url.request_uri,
                                   body=request.body, headers=request.headers,
