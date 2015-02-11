@@ -175,7 +175,7 @@ else:
         default_options = {
             'ciphers': _DEFAULT_CIPHERS,
             'ca_certs': _CA_CERTS,
-            'cert_reqs': 0, #gevent.ssl.CERT_NONE
+            'cert_reqs': gevent.ssl.CERT_REQUIRED
         }
 
         ssl_context_factory = getattr(gevent.ssl, "create_default_context", None)
