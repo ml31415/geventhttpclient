@@ -66,17 +66,16 @@ class URL(object):
                     port = int(port)
                 else:
                     host = netloc
-        
+
         if not port:
             port = DEFAULT_PORTS.get(self.scheme)
-        
+
         self.host = host
         self.port = port
         self.user = user
         self.password = password
 
-        if path:
-            self.path = path
+        self.path = path or '/'
 
         self.query = dict()
         for key, value in urlparse.parse_qs(query).iteritems():
